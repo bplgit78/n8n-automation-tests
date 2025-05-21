@@ -13,3 +13,6 @@ You will need to deploy nodejs and if you want to manage multiple versions of no
     - this will start n8n and you will see a link to access it.
 
 
+Projects:
+1. RAG - chatbot that can answer questions. Uses pinecone vector db. 
+2. vectorize data - RKM to pinecone
