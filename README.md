@@ -13,6 +13,20 @@ You will need to deploy nodejs and if you want to manage multiple versions of no
     - this will start n8n and you will see a link to access it.
 
 
-Projects:
-1. RAG - chatbot that can answer questions. Uses pinecone vector db. 
-2. vectorize data - RKM to pinecone
+Projects: (Low code to no code)
+1. vectorize data - RKM to pinecone
+    - step 1 in creating a chat bot: Data is being loaded to pinecone
+      - Prerequisites:
+        -- you will need a pinecone account and an api key
+        -- you will need to create an index on pinecone
+        -- ensure you pick an embeddings model while creating the index on pinecone
+        -- you will need open ai api key (This will give you access to the open ai embeddings model)
+      - When a new file is added to the google drive, the workflow is triggered
+      - initiate a "download file" operation on the google drive
+      - the downloaded file will then be vectorized to pinecone vector store (You will have to create a pinecone index before this step runs in the workflow)
+      - The pine cone vector store node needs an embeddings model to ensure we are creating embeddings that match the index on pinecone
+      - A default data loader is needed here to ensure that the data being written to pinecone is in the right format.
+      - A text splitter is also needed to ensure the data is being chunked into right size and the chunk overlap is appropriate
+     
+2. 
+        
