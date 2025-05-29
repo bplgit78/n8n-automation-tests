@@ -39,6 +39,9 @@ Projects: (Low code to no code)
          - this node also needs an open ai chat model that will interpret the information retrieved from pinecone and use it to build responses that will be shown to the user
      - Finally a google sheet is attached to this AI agent so any lead information in the chat can be stored and can be used by subsequent workflows for marketing emails
      - This can be enhanced further to make it usable on any website.
+3. A global Error handling workflow
+   - All workflows deployed to the cloud on n8n can use this workflow to send emails if there is a failure.
+   - The failure message will include the error message and the error stack.
 
 
         
