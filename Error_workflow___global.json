@@ -1,0 +1,66 @@
+{
+  "name": "Error workflow - global",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.errorTrigger",
+      "typeVersion": 1,
+      "position": [
+        -300,
+        -120
+      ],
+      "id": "3900a13b-7bc5-4213-ba59-d33d6b271efe",
+      "name": "Error Trigger"
+    },
+    {
+      "parameters": {
+        "sendTo": "bplgm78@gmail.com",
+        "subject": "=Error with workflow {{ $json.workflow.name }}",
+        "message": "={{ $json.execution.error.message }}{{ $json.execution.error.stack }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        -80,
+        -120
+      ],
+      "id": "03f44de6-0c8c-4078-ba70-e1f8641b46e1",
+      "name": "Gmail",
+      "webhookId": "2d2222ac-c0b9-482d-84c9-ab22ca31881e",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "3KiuuLmIwSrcyj1r",
+          "name": "Gmail account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Error Trigger": {
+      "main": [
+        [
+          {
+            "node": "Gmail",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "callerPolicy": "workflowsFromSameOwner",
+    "errorWorkflow": "CAoAt4MxFQ7gnPnN"
+  },
+  "versionId": "75a704ff-f052-4e85-944e-4fb3c427a885",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "dfab1a970d3e1682304211395ef29c43aebb65d30d786c8c0a49e56fd5ed121a"
+  },
+  "id": "CAoAt4MxFQ7gnPnN",
+  "tags": []
+}
