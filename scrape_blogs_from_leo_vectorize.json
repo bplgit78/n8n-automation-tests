@@ -1,0 +1,602 @@
+{
+  "name": "scrape-blogs-from-leo-vectorize",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "54ec83c6-2367-439c-be3e-13c69abf0360",
+      "name": "When clicking \"Execute Workflow\"",
+      "type": "n8n-nodes-base.manualTrigger",
+      "position": [
+        -1580,
+        300
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": "## Scrape latest blogs from leo",
+        "height": 285.66037735849045,
+        "width": 1071.752021563343
+      },
+      "id": "33fd247a-9fdb-45ac-bd7f-601542a24190",
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -1380,
+        180
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": "## vectorize them with GPT",
+        "height": 607,
+        "width": 1045
+      },
+      "id": "d0262012-94cb-4394-911b-9a45ca656d43",
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -180,
+        0
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "post",
+        "options": {}
+      },
+      "id": "443c0ff2-469e-4f3d-a9ff-91282b20ac08",
+      "name": "Split out into items",
+      "type": "n8n-nodes-base.splitOut",
+      "position": [
+        -900,
+        300
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "maxItems": 10
+      },
+      "id": "64e242ff-0d33-460f-95c7-dcfcd54419e7",
+      "name": "Limit to first 3",
+      "type": "n8n-nodes-base.limit",
+      "position": [
+        -700,
+        300
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "operation": "extractHtmlContent",
+        "extractionValues": {
+          "values": [
+            {
+              "key": "data",
+              "cssSelector": "body",
+              "skipSelectors": "img,nav"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "5431c5e4-124c-4e24-8c5d-077e92ae2d95",
+      "name": "Extract Text Only",
+      "type": "n8n-nodes-base.html",
+      "position": [
+        -100,
+        140
+      ],
+      "typeVersion": 1.2
+    },
+    {
+      "parameters": {
+        "operation": "extractHtmlContent",
+        "extractionValues": {
+          "values": [
+            {
+              "key": "post",
+              "cssSelector": "div main div a",
+              "returnValue": "attribute",
+              "attribute": "href",
+              "returnArray": true
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "01635546-a8cc-4ab0-8a0c-c8d95bf0aeb8",
+      "name": "Extract blog names",
+      "type": "n8n-nodes-base.html",
+      "position": [
+        -1100,
+        300
+      ],
+      "typeVersion": 1.2
+    },
+    {
+      "parameters": {
+        "url": "https://www.anzoleaga.com/blog",
+        "options": {}
+      },
+      "id": "84e83ca3-4b9e-4c9d-8de5-a060dc59b853",
+      "name": "Fetch blog List",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        -1300,
+        300
+      ],
+      "typeVersion": 4.2
+    },
+    {
+      "parameters": {
+        "url": "=https://www.anzoleaga.com/{{ $json.post }}",
+        "options": {}
+      },
+      "id": "940dc368-1a23-4b59-8db8-cdfe17e91c7b",
+      "name": "Fetch blog texts",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        -500,
+        300
+      ],
+      "typeVersion": 4.2
+    },
+    {
+      "parameters": {
+        "mode": "insert",
+        "pineconeIndex": {
+          "__rl": true,
+          "value": "sh-ws-db",
+          "mode": "list",
+          "cachedResultName": "sh-ws-db"
+        },
+        "embeddingBatchSize": 300,
+        "options": {
+          "pineconeNamespace": "leo-blogs"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStorePinecone",
+      "typeVersion": 1.1,
+      "position": [
+        440,
+        140
+      ],
+      "id": "e23542c5-d5e7-4462-b5db-7c9a2e4b7365",
+      "name": "Pinecone Vector Store",
+      "credentials": {
+        "pineconeApi": {
+          "id": "AqGGItvxQCHu7EAH",
+          "name": "PineconeApi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        100,
+        440
+      ],
+      "id": "d96a6e24-b4f5-4f39-9c5b-36c41c5ecdbe",
+      "name": "Embeddings OpenAI",
+      "credentials": {
+        "openAiApi": {
+          "id": "HSxLxgAlMdcBQ0NV",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.documentDefaultDataLoader",
+      "typeVersion": 1,
+      "position": [
+        520,
+        340
+      ],
+      "id": "b665a73f-e9b2-4afb-a4b1-c56bf39bd3a6",
+      "name": "Default Data Loader"
+    },
+    {
+      "parameters": {
+        "chunkSize": 500,
+        "chunkOverlap": 30,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.textSplitterRecursiveCharacterTextSplitter",
+      "typeVersion": 1,
+      "position": [
+        400,
+        500
+      ],
+      "id": "fcd0e8f9-b252-405d-bec9-ac8c3996b6eb",
+      "name": "Recursive Character Text Splitter"
+    },
+    {
+      "parameters": {
+        "public": true,
+        "initialMessages": "Hi there! 👋\nMy name is Leo's blog simplifier. How can I assist you today?",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -1440,
+        960
+      ],
+      "id": "d496bfb1-fae1-4500-9cff-8956ba21afef",
+      "name": "When chat message received",
+      "webhookId": "50d05258-cb57-4706-9ed8-a27f16aca7fd"
+    },
+    {
+      "parameters": {
+        "options": {
+          "systemMessage": "=## Role:\nYou are a friendly assistant for a real estate Financier called **Leo Anzoleaga**\n\n##Task:\nYou answer questions about the the blogs posted by Leo.\n\n##Details:\nYou have access to various tools, which you can use correctly to answer questions.\n\n##Tools:\n- **LeoBlogsQA**\nuse this tool to answer questions with knowledge about Leo's blogs.\nAI: If you have any questions about Leo's Blogs, feel free to ask, and I'll provide the information you need using my resources!\nHuman: ## Role:\nYou are a friendly assistant for a real estate Financier called **Leo Anzoleaga**\n\n##Task:\nYou answer questions about the blog.\n\n##Details:\nYou have access to various tools, which you can use correctly to answer questions.\n\n##Tools:\n- **LeoBlogsQAA**\nuse this tool to answer questions with knowledge about the company.\n\n\nAfter a customer asks about open hours, products or business information, ask them for their name, email, specific interests and phone number."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.9,
+      "position": [
+        -1220,
+        960
+      ],
+      "id": "32b34525-78ff-4d4c-8740-12cf54e64a22",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4o",
+          "mode": "list",
+          "cachedResultName": "gpt-4o"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        -1440,
+        1220
+      ],
+      "id": "1c474ef3-10b8-4702-94cd-04c1395ac431",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "HSxLxgAlMdcBQ0NV",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "contextWindowLength": 10
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        -1260,
+        1220
+      ],
+      "id": "e172372f-bc71-4949-b139-24f20be7cc0f",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "pineconeIndex": {
+          "__rl": true,
+          "value": "sh-ws-db",
+          "mode": "list",
+          "cachedResultName": "sh-ws-db"
+        },
+        "options": {
+          "pineconeNamespace": "leo-blogs"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStorePinecone",
+      "typeVersion": 1.1,
+      "position": [
+        -1320,
+        1440
+      ],
+      "id": "6c09b6ba-ee34-4047-a36c-9817066dad1c",
+      "name": "Pinecone Vector Store1",
+      "credentials": {
+        "pineconeApi": {
+          "id": "AqGGItvxQCHu7EAH",
+          "name": "PineconeApi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        -1520,
+        1600
+      ],
+      "id": "59ea48f2-0f02-4e34-9e47-f25d8e411138",
+      "name": "Embeddings OpenAI1",
+      "credentials": {
+        "openAiApi": {
+          "id": "HSxLxgAlMdcBQ0NV",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4o",
+          "mode": "list",
+          "cachedResultName": "gpt-4o"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        -940,
+        1460
+      ],
+      "id": "0fe34995-f7be-43e6-b48a-6b4418f189ac",
+      "name": "OpenAI Chat Model1",
+      "credentials": {
+        "openAiApi": {
+          "id": "HSxLxgAlMdcBQ0NV",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.toolVectorStore",
+      "typeVersion": 1.1,
+      "position": [
+        -1080,
+        1240
+      ],
+      "id": "ea2c3620-f9de-4dc7-8dc5-e713b7be04f4",
+      "name": "LeoBlogsQA"
+    },
+    {
+      "parameters": {
+        "html": "={{ $json.data }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.markdown",
+      "typeVersion": 1,
+      "position": [
+        200,
+        140
+      ],
+      "id": "c45c4fb2-0f02-4f2e-8829-2bd613a4e7fb",
+      "name": "Markdown"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Limit to first 3": {
+      "main": [
+        [
+          {
+            "node": "Fetch blog texts",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract Text Only": {
+      "main": [
+        [
+          {
+            "node": "Markdown",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split out into items": {
+      "main": [
+        [
+          {
+            "node": "Limit to first 3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When clicking \"Execute Workflow\"": {
+      "main": [
+        [
+          {
+            "node": "Fetch blog List",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract blog names": {
+      "main": [
+        [
+          {
+            "node": "Split out into items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch blog List": {
+      "main": [
+        [
+          {
+            "node": "Extract blog names",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch blog texts": {
+      "main": [
+        [
+          {
+            "node": "Extract Text Only",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings OpenAI": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Pinecone Vector Store",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Default Data Loader": {
+      "ai_document": [
+        [
+          {
+            "node": "Pinecone Vector Store",
+            "type": "ai_document",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Recursive Character Text Splitter": {
+      "ai_textSplitter": [
+        [
+          {
+            "node": "Default Data Loader",
+            "type": "ai_textSplitter",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Pinecone Vector Store1": {
+      "ai_vectorStore": [
+        [
+          {
+            "node": "LeoBlogsQA",
+            "type": "ai_vectorStore",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings OpenAI1": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Pinecone Vector Store1",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "LeoBlogsQA",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "LeoBlogsQA": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Markdown": {
+      "main": [
+        [
+          {
+            "node": "Pinecone Vector Store",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "3746ea81-ed0e-49c9-92f3-6098a2e6ca97",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "dfab1a970d3e1682304211395ef29c43aebb65d30d786c8c0a49e56fd5ed121a"
+  },
+  "id": "1YqJGjmCLkuJOIbV",
+  "tags": []
+}
